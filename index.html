@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* Kotak Form */
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 300px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0 15px 0;
+      box-sizing: border-box;
+    }
+
+    /* Styling khusus input yang terkunci */
+    input[readonly] {
+      background-color: #e9ecef;
+      cursor: not-allowed;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Tabel Rekap Data Absen */
+    table {
+      width: 100%;
+      max-width: 500px;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th { background-color: #007bff; color: white; }
+    .terlambat { color: red; font-weight: bold; }
+    .tepat { color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h3>Form Absen Siswa</h3>
+    <label>Nama:</label>
+    <input type="text" id="nama" placeholder="Nama siswa">
+
+    <label>Kelas:</label>
+    <input type="text" id="kelas" placeholder="Kelas">
+
+    <label>Jam Absen (Otomatis):</label>
+    <!-- Tambahkan atribut readonly agar tidak bisa diklik/diubah -->
+    <input type="time" id="jam" readonly>
+
+    <button onclick="simpanAbsen()">Submit Absen</button>
+  </div>
+
+  <!-- TABEL REKAP ABSENSI -->
+  <h3>Data Absensi Hari Ini</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Kelas</th>
+        <th>Jam</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="tabelData">
+      <!-- Data bakal muncul di sini otomatis -->
+    </tbody>
+  </table>
+
+  <script>
+    // Fungsi untuk mengambil format jam "HH:MM" saat ini
+    function getJamSekarang() {
+      let d = new Date();
+      let h = String(d.getHours()).padStart(2, '0');
+      let m = String(d.getMinutes()).padStart(2, '0');
+      return h + ":" + m;
+    }
+
+    // Tampilkan jam secara langsung saat halaman dibuka
+    window.onload = function() {
+      document.getElementById("jam").value = getJamSekarang();
+    };
+
+    function simpanAbsen() {
+      let nama = document.getElementById("nama").value;
+      let kelas = document.getElementById("kelas").value;
+      
+      // Ambil jam terbaru persis saat tombol Submit diklik
+      let jam = getJamSekarang();
+      document.getElementById("jam").value = jam;
+
+      if (!nama || !kelas) {
+        alert("Isi nama dan kelas terlebih dahulu!");
+        return;
+      }
+
+      // Cek batas jam 07:15
+      let [h, m] = jam.split(":").map(Number);
+      let statusText = "Tepat Waktu";
+      let statusClass = "tepat";
+
+      if (h > 7 || (h === 7 && m > 15)) {
+        statusText = "Terlambat";
+        statusClass = "terlambat";
+      }
+
+      // Tambahkan baris baru ke tabel
+      let tbody = document.getElementById("tabelData");
+      let row = `<tr>
+        <td>${nama}</td>
+        <td>${kelas}</td>
+        <td>${jam}</td>
+        <td class="${statusClass}">${statusText}</td>
+      </tr>`;
+
+      tbody.innerHTML += row;
+
+      // Reset input nama & kelas
+      document.getElementById("nama").value = "";
+      document.getElementById("kelas").value = "";
+      alert("Absen berhasil dicatat!");
+    }
+  </script>
+
+</body>
+</html>
